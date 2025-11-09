@@ -18,26 +18,27 @@ $$\   $$ |                              \______|$$ |                    $$\   $$
 
 EOF
 
-set -e
+echo "🚀 Updating system packages..."
+apt update
 
-echo "Creating necessary directories and Docker volume..."
-sudo mkdir -p /var/lib/pufferpanel
-sudo docker volume create pufferpanel-config
+echo "🔧 Installing required packages..."
+apt install -y sudo
+apt install -y systemctl
 
-echo "Creating PufferPanel container..."
-sudo docker create --name pufferpanel \
-    -p 8080:8080 -p 5657:5657 \
-    -v pufferpanel-config:/etc/pufferpanel \
-    -v /var/lib/pufferpanel:/var/lib/pufferpanel:z \
-    -v /var/run/docker.sock:/var/run/docker.sock \
-    --restart=on-failure \
-    pufferpanel/pufferpanel:latest
+echo "🌐 Adding PufferPanel repository..."
+curl -s https://packagecloud.io/install/repositories/pufferpanel/pufferpanel/script.deb.sh?any=true | sudo bash
 
-echo "Starting PufferPanel container..."
-sudo docker start pufferpanel
+echo "📦 Updating package list..."
+sudo apt update
 
-echo "Adding a PufferPanel user interactively..."
-sudo docker exec -it pufferpanel /pufferpanel/pufferpanel user add
+echo "🎮 Installing PufferPanel..."
+sudo apt-get install -y pufferpanel
 
-echo "✅ PufferPanel setup completed!"
-echo "Access the panel on http://localhost:8080"
+echo "👤 Creating a PufferPanel user..."
+sudo pufferpanel user add
+
+echo "✅ Enabling and starting PufferPanel service..."
+sudo systemctl enable --now pufferpanel
+
+echo "🔥 PufferPanel is installed and running!"
+echo "Subscribe To @jazz_12de"
